@@ -1,5 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
+import { ExtensionConfig } from "./config";
 
 /**
  * Writes content to a file at the given URI.
@@ -14,6 +15,9 @@ export async function createFile(
 	content: string | Uint8Array,
 ): Promise<void> {
 	try {
+		const dir = path.dirname(uri.fsPath);
+		await vscode.workspace.fs.createDirectory(vscode.Uri.file(dir));
+
 		const data =
 			typeof content === "string"
 				? new TextEncoder().encode(content)
@@ -39,18 +43,39 @@ export async function createFile(
 }
 
 /**
- * Generates output filename: appends '.base64'.
- * Prevents accidental overwrites of source files.
+ * Generates an output file path based on the original file path and user configuration.
+ * - If `outputFolder` is set, the output file will be placed there (absolute or relative to workspace).
+ * - If `removeOriginalExtension` is true, the original file extension will be removed.
+ * - The `filenameSuffix` will be appended to the output filename.
  *
- * @example
- * getBase64OutputPath('/path/image.png') → '/path/image.png.base64'
- * getBase64OutputPath('C:\\docs\\README') → 'C:\\docs\\README.base64'
- *
- * @param originalPath - Absolute path to source file
- * @returns Absolute path for Base64 output file
+ * @param originalPath - The original file path
+ * @param config - User configuration for output path generation
+ * @returns The generated output file path
  */
-export function getBase64OutputPath(originalPath: string): string {
+export function getOutputPath(
+	originalPath: string,
+	config: ExtensionConfig,
+): string {
 	const dir = path.dirname(originalPath);
-	const basename = path.basename(originalPath);
-	return path.join(dir, `${basename}.base64`);
+	const basename = path.basename(originalPath, path.extname(originalPath));
+	const ext = config.removeOriginalExtension
+		? ""
+		: path.extname(originalPath);
+
+	let outputDir = dir;
+	if (config.outputFolder) {
+		if (path.isAbsolute(config.outputFolder)) {
+			outputDir = config.outputFolder;
+		} else {
+			const workspaceFolder =
+				vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+			if (workspaceFolder) {
+				outputDir = path.join(workspaceFolder, config.outputFolder);
+			}
+		}
+	}
+
+	const suffix = config.filenameSuffix;
+	const outputFilename = `${basename}${ext}${suffix}`;
+	return path.join(outputDir, outputFilename);
 }
