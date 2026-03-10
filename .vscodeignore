@@ -10,6 +10,7 @@ out/**
 esbuild.js
 src/**
 vsc-extension-quickstart.md
+.github/**
 
 # TypeScript and linting
 **/eslint.config.mjs

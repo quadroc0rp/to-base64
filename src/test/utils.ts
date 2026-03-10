@@ -5,13 +5,34 @@ import * as vscode from "vscode";
 
 /**
  * Get absolute path to a fixture file.
- * Uses __dirname which points to out/test/ after compilation.
+ * Works from compiled test location (out/test/) by navigating to src/test/fixtures.
  */
 export function getFixturePath(
 	subpath: string,
 	type: "input" | "expected",
 ): string {
-	return path.join(__dirname, "fixtures", type, subpath);
+	const fromCompiled = path.join(
+		__dirname,
+		"..",
+		"..",
+		"src",
+		"test",
+		"fixtures",
+		type,
+		subpath,
+	);
+
+	// Fallback: assume running from project root
+	const fromCwd = path.join(
+		process.cwd(),
+		"src",
+		"test",
+		"fixtures",
+		type,
+		subpath,
+	);
+
+	return require("fs").existsSync(fromCompiled) ? fromCompiled : fromCwd;
 }
 
 /**
