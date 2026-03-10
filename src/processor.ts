@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
+import { ExtensionConfig } from "./config";
 import toBase64 from "./convertor";
 import { readBinaryFile } from "./loader";
-import { createFile, getBase64OutputPath } from "./writer";
+import { createFile, getOutputPath } from "./writer";
 
 /**
  * Encodes an array of file URIs to Base64 and saves output files.
@@ -10,10 +11,15 @@ import { createFile, getBase64OutputPath } from "./writer";
  * @param fileUris - Array of VS Code URIs pointing to files to encode
  * @returns Promise that resolves when all files are processed (or cancelled)
  */
-export async function processFilesToBase64(fileUris: vscode.Uri[]) {
+export async function processFilesToBase64(
+	fileUris: vscode.Uri[],
+	config: ExtensionConfig,
+) {
 	const progressOptions: vscode.ProgressOptions = {
 		location: vscode.ProgressLocation.Notification,
-		title: "Encoding files to base64",
+		title: config.copyToClipboard
+			? "Encoding to Base64 and copying to clipboard..."
+			: "Encoding to Base64 and saving files...",
 		cancellable: true,
 	};
 
@@ -44,13 +50,18 @@ export async function processFilesToBase64(fileUris: vscode.Uri[]) {
 					lastReported = currentPercent;
 
 					const bytes = await readBinaryFile(uri);
-
 					const base64Content = toBase64(bytes);
 
-					const outputPath = getBase64OutputPath(uri.fsPath);
-					const outputUri = vscode.Uri.file(outputPath);
-
-					await createFile(outputUri, base64Content);
+					if (config.copyToClipboard) {
+						await vscode.env.clipboard.writeText(base64Content);
+						vscode.window.showInformationMessage(
+							`✅ Copied ${uri.fsPath.split("/").pop()} to clipboard as Base64`,
+						);
+					} else {
+						const outputPath = getOutputPath(uri.fsPath, config);
+						const outputUri = vscode.Uri.file(outputPath);
+						await createFile(outputUri, base64Content);
+					}
 				} catch (error: any) {
 					vscode.window.showErrorMessage(
 						`❌ Failed to process ${uri.fsPath.split("/").pop()}: ${error.message}`,
@@ -61,7 +72,9 @@ export async function processFilesToBase64(fileUris: vscode.Uri[]) {
 		},
 	);
 
-	vscode.window.showInformationMessage(
-		`✅ Completed: ${fileUris.length} file(s) encoded to base64`,
-	);
+	if (!config.copyToClipboard) {
+		vscode.window.showInformationMessage(
+			`✅ Completed: ${fileUris.length} file(s) encoded to base64`,
+		);
+	}
 }
