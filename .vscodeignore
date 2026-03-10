@@ -1,0 +1,27 @@
+# Build and dependencies
+.vscode/**
+.vscode-test/**
+node_modules/**
+out/**
+
+# Source and configuration files
+.gitignore
+.yarnrc
+esbuild.js
+src/**
+vsc-extension-quickstart.md
+
+# TypeScript and linting
+**/eslint.config.mjs
+**/*.map
+**/*.ts
+**/tsconfig.json
+
+# Editor and workspace
+**/.obsidian
+**/.vscode-test.*
+
+# Documentation and assets
+docs/**
+**/*.gif
+**/*.svg
