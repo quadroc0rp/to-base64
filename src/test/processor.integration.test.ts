@@ -1,17 +1,24 @@
-// src/test/processor.integration.test.ts
-import * as assert from "assert";
-import { suite, test } from "mocha";
+import assert from "assert";
 import * as vscode from "vscode";
+import { ExtensionConfig, getExtensionConfig } from "../config";
 import toBase64 from "../convertor";
-import { getBase64OutputPath } from "../writer";
+import { getOutputPath } from "../writer";
 import { createTempFile, readFixture } from "./utils";
 
 suite("Processor Integration Tests", () => {
-	// setup(async () => {});
+	function configInit(): ExtensionConfig {
+		const config = getExtensionConfig();
+		config.copyToClipboard = false;
+		config.filenameSuffix = ".base64";
+		config.outputFolder = "";
+		config.removeOriginalExtension = false;
+		return config;
+	}
 
 	suite("End-to-end: read → encode → write", () => {
 		test("hello.txt → hello.txt.base64", async () => {
-			// Arrange
+			const config = configInit();
+
 			const inputBytes = await readFixture("hello.txt", "input");
 			const expectedBase64 = new TextDecoder()
 				.decode(await readFixture("hello.txt.base64", "expected"))
@@ -21,7 +28,7 @@ suite("Processor Integration Tests", () => {
 			// Act
 			const bytes = await vscode.workspace.fs.readFile(tempUri);
 			const actualBase64 = toBase64(bytes);
-			const outputPath = getBase64OutputPath(tempUri.fsPath);
+			const outputPath = getOutputPath(tempUri.fsPath, config);
 			const outputUri = vscode.Uri.file(outputPath);
 			await vscode.workspace.fs.writeFile(
 				outputUri,
@@ -37,6 +44,8 @@ suite("Processor Integration Tests", () => {
 		});
 
 		test("emoji.txt handles UTF-8 correctly", async () => {
+			const config = configInit();
+
 			const inputBytes = await readFixture("emoji.txt", "input");
 			const expectedBase64 = new TextDecoder()
 				.decode(await readFixture("emoji.txt.base64", "expected"))
@@ -47,6 +56,8 @@ suite("Processor Integration Tests", () => {
 		});
 
 		test("binary.bin preserves raw bytes", async () => {
+			const config = configInit();
+
 			const inputBytes = await readFixture("binary.bin", "input");
 			const expectedBase64 = new TextDecoder()
 				.decode(await readFixture("binary.bin.base64", "expected"))
@@ -57,6 +68,8 @@ suite("Processor Integration Tests", () => {
 		});
 
 		test("empty.txt produces empty base64", async () => {
+			const config = configInit();
+
 			const inputBytes = await readFixture("empty.txt", "input");
 			const expectedBase64 = "";
 
@@ -67,22 +80,29 @@ suite("Processor Integration Tests", () => {
 
 	suite("Filename generation", () => {
 		test("Adds .base64", () => {
+			const config = configInit();
+
 			assert.strictEqual(
-				getBase64OutputPath("/project/src/app.ts"),
+				getOutputPath("/project/src/app.ts", config),
 				"/project/src/app.ts.base64",
 			);
 		});
 
 		test("Handles files without extension", () => {
+			const config = configInit();
+
 			assert.strictEqual(
-				getBase64OutputPath("/project/README"),
+				getOutputPath("/project/README", config),
 				"/project/README.base64",
 			);
 		});
 
 		test("Preserves directory structure", () => {
-			const result = getBase64OutputPath(
+			const config = configInit();
+
+			const result = getOutputPath(
 				"C:\\Users\\test\\docs\\report.pdf",
+				config,
 			);
 			assert.ok(result.endsWith("report.pdf.base64"));
 			assert.ok(result.includes("docs"));
