@@ -7,19 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.2.0] - 2026-03-11
 
 ### Added
 
-- _(Nothing yet — this section is for upcoming changes)_
+- ✅ **Configuration System**: Workspace/User settings for extension behavior
+- ✅ **Copy to Clipboard Mode**: Copy Base64 directly to clipboard instead of saving files (single file only)
+- ✅ **Custom Output Folder**: Configure where encoded files are saved (`./base64/`, custom path, or same as source)
+- ✅ **Custom Filename Suffix**: Change `.base64` to custom suffix or remove entirely
+- ✅ **Remove Original Extension**: Toggle whether to keep original file extension in output filename
+- ✅ **Configuration Commands**: Change configuration via Command Palette (`Ctrl+Shift+P`) or Settings:
+  - `to-base64: Set Copy to Clipboard Mode`
+  - `to-base64: Set Output Folder`
+  - `to-base64: Set Filename Suffix`
+  - `to-base64: Set Remove Original Extension`
+- ✅ **Improved Testing**: Added unit tests for configuration system and commands
 
 ### Changed
 
-- _(Nothing yet)_
+- 🔧 Refactored `processor.ts` to accept configuration object for flexible output behavior
+- 🔧 Updated `writer.ts` with `getOutputPath()` function for configurable filename generation
+- 🔧 Enhanced `config.ts` with comprehensive JSDoc documentation
+- 🔧 Added `commands.ts` for configuration command registration
+- 🔧 Updated badge styling in README for better visual appeal
 
 ### Fixed
 
-- _(Nothing yet)_
+- 🐛 Fixed filename generation logic to properly handle `removeOriginalExtension` setting
+- 🐛 Fixed test fixture path resolution for CI/headless environments
+- 🐛 Fixed progress bar increment calculation for accurate percentage display
+
+### Security
+
+- 🔐 All configuration updates respect VS Code configuration scope (workspace vs global)
+- 🔐 No external network calls; all processing is local
 
 ---
 
@@ -27,11 +48,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Removed the keybindings due to the context issues
+- ❌ Removed keyboard shortcut (`Ctrl+Alt+B`) due to activation context inconsistencies
 
 ### Fixed
 
-- `No files selected` issue when using the keybinding, for now the feature of using the keybinding `Ctrl+Alt+B` removed
+- 🐛 Fixed "No files selected" issue when using keybinding (temporarily disabled feature)
 
 ---
 
@@ -44,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Multi-file selection support with batch processing
 - ✅ Binary-safe encoding (images, executables, archives)
 - ✅ Smart output naming: `filename.extension.base64` to prevent overwrites
-- ✅ Progress notification
+- ✅ Progress notification with cancellation support
 - ✅ Automatic folder filtering (only processes files)
 - ✅ Comprehensive test suite:
   - Unit tests for `toBase64()` converter (ASCII, UTF-8, binary, edge cases)
@@ -56,3 +77,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - 🔐 All file operations respect VS Code workspace trust model
+- 🔐 No external network calls; all processing is local
