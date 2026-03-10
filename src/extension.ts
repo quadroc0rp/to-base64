@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import { registerConfigurationCommands } from "./commands";
+import { getExtensionConfig } from "./config";
 import { processFilesToBase64 } from "./processor";
 
 /**
@@ -8,6 +10,9 @@ import { processFilesToBase64 } from "./processor";
  * @param context - The extension context for subscriptions and state
  */
 export function activate(context: vscode.ExtensionContext) {
+	// Register configuration commands for toggling settings
+	registerConfigurationCommands(context);
+
 	/**
 	 * Command handler for 'to-base64.encode'.
 	 * Handles single/multi-selection, filters to files only, and launches encoding.
@@ -18,14 +23,22 @@ export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand(
 		"to-base64.encode",
 		async (uri: vscode.Uri, uris: vscode.Uri[]) => {
-			const selectedUris = uris && uris.length > 0 ? uris : [uri];
+			const config = getExtensionConfig();
 
+			const selectedUris = uris && uris.length > 0 ? uris : [uri];
 			const validUris = selectedUris.filter(
 				(u): u is vscode.Uri => u !== undefined,
 			);
 
 			if (validUris.length === 0) {
 				vscode.window.showWarningMessage("No files selected");
+				return;
+			}
+
+			if (config.copyToClipboard && validUris.length > 1) {
+				vscode.window.showWarningMessage(
+					"Copy to Clipboard mode only supports single file selection. Please select one file or disable Copy to Clipboard mode.",
+				);
 				return;
 			}
 
@@ -60,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}
 
-			await processFilesToBase64(fileUris);
+			await processFilesToBase64(fileUris, config);
 		},
 	);
 
