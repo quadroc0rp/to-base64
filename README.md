@@ -2,8 +2,8 @@
   <img src="./docs/icons/icon-256.png" alt="to-base64 Logo" width="256" height="256" />
 </p>
 <p align="center">
-  <a href="https://img.shields.io/badge/version-0.1.0-blue?logo=visualstudiocode">
-    <img src="https://img.shields.io/badge/version-0.1.0-blue?logo=visualstudiocode" alt="Version" />
+  <a href="https://img.shields.io/badge/version-0.1.1-yellow?logo=visualstudiocode">
+    <img src="https://img.shields.io/badge/version-0.1.1-yellow?logo=visualstudiocode" alt="Version" />
   </a>
   <a href="https://img.shields.io/badge/License-MIT-blue.svg">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" />
