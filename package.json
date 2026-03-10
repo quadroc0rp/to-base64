@@ -2,7 +2,7 @@
   "name": "to-base64",
   "displayName": "to-base64",
   "description": "Encode files to Base64 directly from the Explorer window",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "quadroc0rp",
   "icon": "icon-128.png",
   "repository": {
@@ -43,15 +43,7 @@
           "group": "navigation@2"
         }
       ]
-    },
-    "keybindings": [
-      {
-        "command": "to-base64.encode",
-        "key": "ctrl+alt+b",
-        "mac": "cmd+alt+b",
-        "when": "filesExplorerFocus && !explorerResourceIsFolder"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

@@ -23,6 +23,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-03-10
+
+### Removed
+
+- Removed the keybindings due to the context issues
+
+### Fixed
+
+- `No files selected` issue when using the keybinding, for now the feature of using the keybinding `Ctrl+Alt+B` removed
+
+---
+
 ## [0.1.0] - 2026-03-10
 
 ### Added
@@ -40,18 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Filename generation tests
 - ✅ Workspace-agnostic test utilities (no workspace required)
 - ✅ Fixture auto-copy during build (`esbuild.js` hook)
-
-### Changed
-
-- _(Nothing changed, the first release)_
-
-### Fixed
-
-- _(No issues found)_
-
-### Removed
-
-- _(Nothing removed in initial release)_
 
 ### Security
 
